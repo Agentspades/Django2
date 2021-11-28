@@ -1,13 +1,18 @@
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from Auth.models import User
 
 from .serializers import RegistrationList, RegistrationSerializer, EventList, UpdateSerializer
 from .models import EventRegistration, Event
+
+
+def GetUser(request):
+    return request.user
 
 
 @api_view(('GET', ))
@@ -45,25 +50,25 @@ class UpdateRegistration(APIView):
 
 
 class Register(APIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = RegistrationSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            user = serializer.validated_data.get('user')
+            user = request.user
             event = serializer.validated_data.get('event')
             attendees = serializer.validated_data.get('attendees')
             try:
-                userID = User.objects.get(id=user)
                 eventID = Event.objects.get(id=event)
                 new_record = EventRegistration(
-                    eventID=eventID, userID=userID, attendees=attendees)
+                    eventID=eventID, userID=user, attendees=attendees)
                 new_record.save()
                 message = f'A new record was added, user: {user}, event: {event}, attendees: {attendees}'
                 return Response({'message': message}, status=status.HTTP_200_OK)
             except:
-                message = f'There was an error creating a user'
+                message = f'There was an error creating a registration'
                 return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

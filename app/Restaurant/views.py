@@ -12,23 +12,23 @@ from .models import RestaurantBooking
 
 
 class UpdateBooking(APIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = Booking
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            email = serializer.validated_data.get('email')
+            user = request.user
             phone = serializer.validated_data.get('phone')
             guests = serializer.validated_data.get('guests')
             date = serializer.validated_data.get('datetime')
             try:
-                user = User.objects.get(email=email)
                 registration = RestaurantBooking.objects.get(userID=user)
                 registration.guests = guests
                 registration.datetime = date
                 registration.save()
-                message = f'A record was updated for name: {user}, phone: {phone}, guests: {guests}, Date: {date}'
+                message = f'A record was updated for name: {user.name}, phone: {phone}, guests: {guests}, Date: {date}'
                 return Response({'message': message}, status=status.HTTP_200_OK)
             except:
                 message = f'There was an error updating name: {user}, phone: {phone}, guests: {guests}, Date: {date}'
@@ -38,22 +38,22 @@ class UpdateBooking(APIView):
 
 
 class Booking(APIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = Booking
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            email = serializer.validated_data.get('email')
+            user = request.user
             phone = serializer.validated_data.get('phone')
             guests = serializer.validated_data.get('guests')
             date = serializer.validated_data.get('datetime')
             try:
-                user = User.objects.get(email=email)
                 new_record = RestaurantBooking(
                     userID=user, phone=phone, guests=guests, datetime=date)
                 new_record.save()
-                message = f'A booking was added for name: {user}, phone: {phone}, guests: {guests}, Date: {date}'
+                message = f'A booking was added for name: {user.name}, phone: {phone}, guests: {guests}, Date: {date}'
                 return Response({'message': message}, status=status.HTTP_200_OK)
             except:
                 message = f'There was an error saving the booking'

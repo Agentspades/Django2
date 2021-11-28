@@ -9,7 +9,6 @@ class BookingSerializer(serializers.ModelSerializer):
 
 
 class Booking(serializers.Serializer):
-    email = serializers.CharField(max_length=255)
     phone = serializers.IntegerField()
     guests = serializers.IntegerField()
     datetime = serializers.DateTimeField()
