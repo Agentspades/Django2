@@ -11,10 +11,6 @@ from .serializers import RegistrationList, RegistrationSerializer, EventList, Up
 from .models import EventRegistration, Event
 
 
-def GetUser(request):
-    return request.user
-
-
 @api_view(('GET', ))
 def eventView(request, id):
     try:

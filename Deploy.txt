@@ -1,0 +1,19 @@
+Create EC2 instance
+Check python is installed (python -V / python3 -V)
+Ensure minimum python version of 3.9 is installed
+Install pipenv (pip install pipenv / pip3 install pipenv)
+Install MySQL
+Create an empty database
+Clone project from github (git clone)
+cd into the "app" directory (the one with reqs.txt)
+Create a virtual environment (pipenv install -r reqs.txt)
+    - this will create the virtual and environment and install all dependancies in reqs.txt
+Inside VSCode press F1 and select "Python: Select Interpreter"
+Choose the one that has pipenv at the end of the name should have a star next to it
+From here you might need to restart the VS Code terminal if already running so it activates the environment 
+    (terminal path should start with (django) this depends on what you pipenv is called should be the name of the parent directory)
+Modify the settings.py file to change the database server information to point to where the database server is and the login information as well as the database schema name
+Now you can start the server and run migrations to generate the database 
+    (python manage.py runserver / python3 manage.py runserver)
+    (python manage.py makemigrations / python3 manage.py makemigrations)
+    (python manage.py migrate / python3 manage.py migrate)

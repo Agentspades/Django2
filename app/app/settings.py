@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'Auth',  # handles users and logins
     'Tips',  # handles weekly tips
     'Forum',  # handles forum
+    'weeklytips',  # Weekly tips Rhi
 ]
 
 AUTH_USER_MODEL = 'Auth.User'

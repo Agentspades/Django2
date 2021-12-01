@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/', include('Auth.urls')),
     path('api/', include('Tips.urls')),
     path('api/', include('Forum.urls')),
+    path('api/', include('weeklytips.urls')),
 ]
 
 if settings.DEBUG:  # allows for viewing of images from the admin panel
