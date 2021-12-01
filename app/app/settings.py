@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'Tips',  # handles weekly tips
     'Forum',  # handles forum
     'weeklytips',  # Weekly tips Rhi
+    'Challenges',  # Challenges Finn
 ]
 
 AUTH_USER_MODEL = 'Auth.User'
