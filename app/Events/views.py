@@ -4,11 +4,24 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-
-from Auth.models import User
-
-from .serializers import RegistrationList, RegistrationSerializer, EventList, UpdateSerializer
+from django.db.models import Sum
+from .serializers import RegistrationList, RegistrationSerializer, EventList
 from .models import EventRegistration, Event
+
+
+@api_view(('GET', ))
+def checkAttendees(request, id):
+    try:
+        event = Event.objects.get(id=id)
+        maxAttendees = event.maxAttendees
+        currentlyBooked = EventRegistration.objects.filter(
+            eventID=id).aggregate(Sum('attendees'))['attendees__sum']
+        if currentlyBooked == None:
+            currentlyBooked = 0
+        spotsLeft = maxAttendees - currentlyBooked
+        return Response({'remaining': spotsLeft}, status=status.HTTP_200_OK)
+    except:
+        return Response({'message': 'error checking attendee count'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(('GET', ))
@@ -21,25 +34,33 @@ def eventView(request, id):
 
 
 class UpdateRegistration(APIView):
-    serializer_class = UpdateSerializer
+    permission_classes = (IsAuthenticated)
+    serializer_class = RegistrationSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            email = serializer.validated_data.get('email')
-            event = serializer.validated_data.get('event')
+            user = request.user
+            eventID = serializer.validated_data.get('event')
+            event = Event.objects.filter(id=eventID)
             attendees = serializer.validated_data.get('attendees')
+            count = EventRegistration.objects.filter(
+                eventID=eventID).aggregate(Sum('attendees'))['attendees__sum']
+            if count == None:
+                count = 0
             try:
-                userID = User.objects.get(email=email)
-                user = EventRegistration.objects.get(
-                    userID=userID, eventID=event)
-                user.attendees = attendees
-                user.save()
-                message = f'A record was updated for user: {user}, email: {email}, attendees: {attendees}'
+                userReg = EventRegistration.objects.filter(
+                    userID=user, eventID=event)
+                if ((count + attendees) <= event.maxAttendees):
+                    userReg.attendees = attendees
+                    user.save()
+                    message = f'A record was updated for user: {user}, attendees: {attendees}'
+                else:
+                    message = f'Event {event} is at capacity'
                 return Response({'message': message}, status=status.HTTP_200_OK)
             except:
-                message = f'There was an error updating a user'
+                message = f'There was an error updating booking'
                 return Response({'message': message}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -54,14 +75,23 @@ class Register(APIView):
 
         if serializer.is_valid():
             user = request.user
-            event = serializer.validated_data.get('event')
+            eventID = serializer.validated_data.get('event')
             attendees = serializer.validated_data.get('attendees')
+            count = EventRegistration.objects.filter(
+                eventID=eventID).aggregate(Sum('attendees'))['attendees__sum']
+            if count == None:
+                count = 0
             try:
-                eventID = Event.objects.get(id=event)
-                new_record = EventRegistration(
-                    eventID=eventID, userID=user, attendees=attendees)
-                new_record.save()
-                message = f'A new record was added, user: {user}, event: {event}, attendees: {attendees}'
+                event = Event.objects.get(id=eventID)
+                if EventRegistration.objects.filter(userID=user, eventID=event):
+                    return Response({'message': f'user {user.name} already has a booking for event {event}'}, status=status.HTTP_403_FORBIDDEN)
+                if ((count + attendees) <= event.maxAttendees):
+                    new_record = EventRegistration(
+                        eventID=event, userID=user, attendees=attendees)
+                    new_record.save()
+                    message = f'A new record was added, user: {user}, event: {eventID}, attendees: {attendees}'
+                else:
+                    message = f'Event {event.name} is at capacity {event.maxAttendees}'
                 return Response({'message': message}, status=status.HTTP_200_OK)
             except:
                 message = f'There was an error creating a registration'

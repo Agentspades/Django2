@@ -31,7 +31,7 @@ class EventRegistration(models.Model):
     userID = models.ForeignKey(
         'Auth.User', on_delete=CASCADE, db_column='userID', default=0, verbose_name='Email')
     attendees = models.PositiveSmallIntegerField(
-        default=1, validators=[MinValueValidator(1), MaxValueValidator(5)])
+        default=1, validators=[MinValueValidator(1), MaxValueValidator(6)])
 
     class Meta:
         db_table = 'registrations'

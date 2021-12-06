@@ -7,7 +7,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from .models import User
 from datetime import datetime
-from .serializers import UserSerializer
 # Create your views here.
 
 
@@ -25,7 +24,7 @@ def login(request):
     token, _ = Token.objects.get_or_create(user=user)
     user.last_login = datetime.now()
     user.save()
-    return Response({'user': UserSerializer(user).data, 'token': {token.key}}, status=status.HTTP_200_OK)
+    return Response({'token': {token.key}}, status=status.HTTP_200_OK)
 
 
 @csrf_exempt
@@ -37,4 +36,4 @@ def create(request):
     name = str(request.data.get('name'))
     user = User.objects.create_user(email, password, name)
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({'User': UserSerializer(user).data, 'token': {token.key}}, status=status.HTTP_200_OK)
+    return Response({'token': {token.key}}, status=status.HTTP_200_OK)

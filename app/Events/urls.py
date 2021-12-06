@@ -13,5 +13,6 @@ urlpatterns = [
     path('events/register/', views.Register.as_view()),
     path('registration/update/', views.UpdateRegistration.as_view()),
     url('events/registrations/(?P<id>\d+)/', views.eventView,),
+    url('events/check/(?P<id>\d+)/', views.checkAttendees,),
     path('events/', include(router.urls)),
 ]
