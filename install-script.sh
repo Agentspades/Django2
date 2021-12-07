@@ -3,8 +3,6 @@ sudo su
 apt update && apt upgrade
 echo Installing pip
 apt install python3-pip
-echo CLoning source
-git clone https://github.com/agentspades/Django2.git
 echo Installing MySQL
 apt install mysql-server
 echo Setting up MySQL
