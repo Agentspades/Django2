@@ -1,4 +1,4 @@
 echo Starting server
-python3 manage.py migrate
-python3 manage.py createsuperuser
-python3 manage.py runserver 0.0.0.0:80
+python3 ./app/manage.py migrate
+python3 ./app/manage.py createsuperuser
+python3 ./app/manage.py runserver 0.0.0.0:80

@@ -1,0 +1,25 @@
+git clone https://github.com/agentspades/Django2.git
+cd Django2
+# remove all the random bytecode from here and paste in the text from the file on windows (copy from notepad then just right click in putty to paste)
+nano ./app/reqs.txt
+save file
+sudo sh install-script.sh
+y to all the install stuff
+when mysql asks about password validators say n
+then enter a root password
+then y for the next 4 options
+# TAFESDG can be anything you want to call the database
+# if you forget the semi colon then you just do it on the next line and hit enter
+then when you get a MySQL shell type CREATE DATABASE TAFESDG;
+then SHOW SCHEMAS;
+# check that the schema you created is listed
+type exit
+then y for the next 3 options
+
+when finished running
+
+sudo nano ./app/app/settings.py
+change database settings (name=schema name, user=root, password=password you set earlier, host=localhost)
+change ALLOWED_HOSTS = [] to ALLOWED_HOSTS = ['publicer ec2 ip', 'public ec2 DNS']
+save file
+runs sudo sh setup-server.sh
